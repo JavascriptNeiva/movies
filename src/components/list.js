@@ -1,39 +1,36 @@
-import React from 'react';
-import Item from './item';
-import Input from './input';
-
-
+import React from 'react'
+import Item from './item'
+import Input from './input'
+import Datasource from '../api'
 
 export default class List extends React.Component {
-
-    render(){
-        const Search =[{title:'batman1',year:1996,type:'movie',Poster:'urlImagen'},
-                        {title:'batman2',year:1996,type:'movie',Poster:'urlImagen'},
-                        {title:'batman3',year:1996,type:'movie',Poster:'urlImagen'},
-                        {title:'batman4',year:1996,type:'movie',Poster:'urlImagen'},
-                        {title:'batman5',year:1996,type:'movie',Poster:'urlImagen'},
-                        {title:'batman6',year:1996,type:'movie',Poster:'urlImagen'},
-                        {title:'batman7',year:1996,type:'movie',Poster:'urlImagen'},
-                        {title:'batman8',year:1996,type:'movie',Poster:'urlImagen'},
-                        {title:'batman9',year:1996,type:'movie',Poster:'urlImagen'},
-                        {title:'batman10',year:1996,type:'movie',Poster:'urlImagen'}
-                    ]
-        const totalResult = 50000;
-        return(
-            <div>
-                <h1>List Movies</h1>
-                <div> 
-                    <Input/>
-                    <div>
-                        <h3>Results: { totalResult }</h3>
-                        { Search.map((item,index) => <Item search={ item }  />)}
-                    </div>
-                    
-                </div>
-            </div>
-        );
+  constructor (props) {
+    super(props)
+    this.state = {
+      Search: [],
+      totalResult: 0
     }
+  }
+  async componentDidMount () {
+    let { data } = await Datasource.getMoviesByName('batman')
+    this.setState({
+      Search: data.Search,
+      totalResult: data.totalResults
+    })
+  }
+
+  render () {
+    return (
+      <div onScroll={(e => console.log(e))}>
+        <h1>List Movies</h1>
+        <div>
+          <Input />
+          <div>
+            <h3>Results: { this.state.totalResult }</h3>
+            { this.state.Search.map((item, index) => <Item search={item} key={index} />) }
+          </div>
+        </div>
+      </div>
+    )
+  }
 }
-
-
-
