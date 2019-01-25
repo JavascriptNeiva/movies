@@ -1,25 +1,16 @@
 
-import React, { Component } from 'react';
-import './App.css';
-import List from './components/list';
-import Datasource from './api';
+import React, { Component } from 'react'
+import './App.css'
+import List from './components/list'
 
 class App extends Component {
-  async componentDidMount () {
-    let { data, status } = await Datasource.getMoviesByName('batman')
-    console.log(data)
-    console.log(status)
-  }
   render () {
     return (
-      <div className="App">
-        <List/>
-
+      <div className='App'>
+        <List />
       </div>
     )
   }
 }
 
-
-export default App;
-
+export default App
