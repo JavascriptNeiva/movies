@@ -41,25 +41,25 @@ export default class List extends React.Component {
   }
 
   handleScroll (e) {
-    // console.log(e)
-    if (window.innerHeight + document.documentElement.scrollTop > document.documentElement.offsetHeight - 70 && !this.state.loadingMore) {
+    if (window.innerHeight + document.documentElement.scrollTop > document.documentElement.offsetHeight - 30 && !this.state.loadingMore) {
       this.handlePaginate()
     }
   }
 
   async handlePaginate () {
-    let { currentPage, Search, text } = this.state
-    let { data } = await Datasource.getMoviesByName(text, currentPage + 1)
+    let { currentPage, Search, text, totalResult } = this.state
     this.setState({ loadingMore: true })
-    if (data.Response === 'True') {
-      this.setState({
-        Search: [...Search, ...data.Search],
-        currentPage: currentPage + 1,
-        loadingMore: false
-      })
-    } else {
-      window.alert('error paginando')
+    let { data } = await Datasource.getMoviesByName(text, currentPage + 1)
+    if (Search.length !== totalResult) {
+      if (data.Response === 'True') {
+        this.setState({
+          Search: [...Search, ...data.Search],
+          currentPage: currentPage + 1,
+          loadingMore: false
+        })
+      }
     }
+    return null
   }
 
   componentDidMount () {
@@ -78,6 +78,7 @@ export default class List extends React.Component {
           <div className='List-container'>
             { this.state.Search.map((item, index) => <Item search={item} key={index} />) }
           </div>
+          {this.state.loadingMore ? <h4>Cargando mas peliculas</h4> : null}
         </div>
       </div>
     )
