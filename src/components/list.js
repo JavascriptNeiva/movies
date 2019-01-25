@@ -9,45 +9,73 @@ export default class List extends React.Component {
     this.state = {
       Search: [],
       totalResult: 0,
-      error: null
+      error: null,
+      currentPage: 1,
+      loadingMore: false,
+      text: ''
     }
-
+    this.handleScroll = this.handleScroll.bind(this)
     this.onSearch = this.onSearch.bind(this)
     this.getMovies = this.getMovies.bind(this)
-    
   }
-  
-  onSearch(text){
-    if(text!==''){
-      this.getMovies(text) 
-    }
-    else {
+
+  onSearch (text) {
+    if (text !== '') {
+      this.getMovies(text)
+    } else {
       console.log('No hay busqueda')
     }
-    
   }
 
-  async getMovies(text){
+  async getMovies (text) {
+    this.setState({ text })
     let { data } = await Datasource.getMoviesByName(text)
-    if(data.Response === 'True'){
+    if (data.Response === 'True') {
       this.setState({
-      Search: data.Search,
-      totalResult: data.totalResults
-    })
+        Search: data.Search,
+        totalResult: data.totalResults
+      })
     } else {
-      this.setState({Search:[],totalResult:0})
+      this.setState({ Search: [], totalResult: 0 })
     }
   }
 
+  handleScroll (e) {
+    // console.log(e)
+    if (window.innerHeight + document.documentElement.scrollTop > document.documentElement.offsetHeight - 70 && !this.state.loadingMore) {
+      this.handlePaginate()
+    }
+  }
+
+  async handlePaginate () {
+    let { currentPage, Search, text } = this.state
+    let { data } = await Datasource.getMoviesByName(text, currentPage + 1)
+    this.setState({ loadingMore: true })
+    if (data.Response === 'True') {
+      this.setState({
+        Search: [...Search, ...data.Search],
+        currentPage: currentPage + 1,
+        loadingMore: false
+      })
+    } else {
+      window.alert('error paginando')
+    }
+  }
+
+  componentDidMount () {
+    // this.containerMovies.addEventListener('scroll', e => {
+    //   console.log(e)
+    // })
+    window.addEventListener('scroll', this.handleScroll)
+  }
   render () {
     return (
-      <div onScroll={(e => console.log(e))} >
+      <div>
         <h1>List Movies</h1>
         <div>
-          <Input search={ this.onSearch }/>
-          <h3>Results: { this.state.totalResult }</h3>
+          <Input search={this.onSearch} />
+          <h3>Results: {this.state.totalResult}</h3>
           <div className='List-container'>
-            
             { this.state.Search.map((item, index) => <Item search={item} key={index} />) }
           </div>
         </div>
